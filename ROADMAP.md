@@ -1,6 +1,11 @@
 # TipSplitter roadmap
 
-The merged baseline through PR #34 offers a browser-local tip allocation preview, optional hosted DEV authentication, tenant-scoped roster schema, membership authorization and a separate read-only shared roster. Issue #35 proposes offline owner-controlled DEV provisioning tooling; no hosted operation is authorized by that proposal. [SPEC.md](SPEC.md) defines the calculation contract; [docs/PRD.md](docs/PRD.md) records product direction and open business decisions. Future sequencing is provisional.
+The merged baseline through PR #37 offers a browser-local tip allocation preview,
+optional DEV authentication, tenant-scoped roster schema/authorization, a separate
+read-only shared roster and offline owner-controlled DEV provisioning. Issue #38
+proposes shared roster editing on this feature branch; no hosted action or
+deployment is performed. [SPEC.md](SPEC.md) defines the calculation contract;
+[docs/PRD.md](docs/PRD.md) records product direction and open business decisions.
 
 ## Completed
 
@@ -18,18 +23,21 @@ The following milestones are merged into `main`:
 | Optional DEV email/password authentication | Verified session-gated login/logout; account- and project-isolated browser-local calculator rosters; no application-table access or shared-roster synchronization. The frontend suite at that milestone has 122 tests (60 calculation, 15 calculator interface, 28 mocked Auth, and 19 configuration/request/storage-isolation tests). PR #30 reports owner-run browser login/logout acceptance separately from Codex CI results. | [PR #30](https://github.com/ciraheta3/TipSplitter/pull/30) |
 | Read-only shared roster | Membership-aware restaurant selection and separate bounded GET-only roster; 153 frontend tests. Owner reports authorized read, unrelated nonmember denial, existing-session revocation, four-table GET-only inspection and two-user/fixture cleanup passed; not independently executed by Codex. Extended checks remain Issue #36. | [PR #34](https://github.com/ciraheta3/TipSplitter/pull/34) |
 
-These milestones provide a browser-local calculator, optional DEV authentication, database authorization and a read-only shared roster. They do not provide shared editing, a financial ledger, or a production-ready service.
+PR #37 also merged [offline owner-controlled DEV provisioning](docs/DEV-PROVISIONING.md)
+with private plans, guarded SQL generation and disposable tests. No hosted execution
+or production administration is supplied. These merged milestones do not provide
+shared editing, a financial ledger or a production-ready service.
 
 ## In progress
 
-- **Issue #35 — offline owner-controlled DEV provisioning foundation:** proposed [private plan and guarded SQL workflow](docs/DEV-PROVISIONING.md), offline tests and disposable PostgreSQL verification. One fictional restaurant, first admin, approved additional members, exact revocation and separate empty-roster cleanup. Independent review/Mac testing remain pending; no hosted action or Issue #36 acceptance is performed. This is not production account administration or invitations.
+- **Issue #38 — scoped shared roster editing:** proposed [management forms and typed write adapter](docs/SHARED-ROSTER-EDITING.md), exact numeric text/string transport, NULL/zero defaults and short-lived xmin conflict checks under existing grants/RLS. Real local Auth/PostgREST component evidence passed; full CLI startup timed out. Review, Mac/full-stack and owner DEV acceptance remain pending; Issue #36 stays independent. No calculator integration or security migration.
 
 ## Planned
 
 No delivery dates are committed. Each milestone needs separate scope and review:
 
 1. **Production trusted account lifecycle:** invitations, account changes, audited revocation and recovery through a separately approved architecture; Issue #35 supplies only an offline synthetic DEV foundation.
-2. **Shared roster editing:** after the merged read-only milestone, add shared writes, exact numeric-text weight transport, import policy, and synchronization/conflict handling under separately reviewed rules.
+2. **Shared roster synchronization/import:** Issue #38 scopes in-app defaults only. Persistent/offline synchronization, import and durable conflict/history protocols need separate review.
 3. **Shifts and immutable history:** lunch/dinner participation, finalization, immutable collected-total and actual-payout snapshots, and correction/audit rules.
 4. **Adjustments and reconciliation:** early departure and understaffing after interaction rules are agreed; preserve true collected totals and recorded payouts.
 5. **Reporting and export:** scope manager reports, exports, and any staff-facing baseline worksheets separately from fiscal records.

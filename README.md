@@ -2,7 +2,7 @@
 
 TipSplitter helps restaurant managers preview how a pooled cash and credit tip total is split among employees using share weights. The current application is a browser-local calculator with optional hosted DEV email/password authentication; the product direction is a shared shift-management application with auditable payout history.
 
-## Merged features (through PR #34)
+## Merged features (through PR #37)
 
 - Cash and credit entry combined into one tip pool, with blank inputs treated as zero.
 - Employee roster with names, job titles, share weights, and add/remove controls, saved in this browser's localStorage.
@@ -15,15 +15,30 @@ TipSplitter helps restaurant managers preview how a pooled cash and credit tip t
 
 For a $100.00 pool with weights 100:50, cent mode previews $66.66 and $33.33 with $0.01 unassigned. Whole-dollar mode previews $66 and $33 with $1.00 unassigned. These are allocation previews, not records of actual payments.
 
-## Proposed offline DEV tooling (Issue #35)
+## Merged offline DEV tooling (Issue #35 / PR #37)
 
 The [owner provisioning playbook](docs/DEV-PROVISIONING.md) describes a private, offline plan/SQL generator for one fictional DEV restaurant and explicitly approved existing synthetic accounts. Nothing connects or executes SQL. Separate owner gates apply to every operation and cleanup. PR #34 is merged; its owner-reported read-only acceptance and remaining Issue #36 cases are recorded in [SHARED-ROSTER.md](docs/SHARED-ROSTER.md).
+
+## Proposed shared roster editing (Issue #38 feature branch)
+
+This branch adds **Manage shared roster · DEV** for active same-restaurant admins
+and closers: add/edit/activate/deactivate roles and employees with exact default
+share weights. Decimal text casts/string writes preserve NULL inheritance and
+explicit zero. Short-lived `xmin` checks reject stale edits under existing RLS/ACLs;
+there is no schema/security change or calculator synchronization. The real local
+Auth/PostgREST component gate passed; full Supabase CLI startup timed out here.
+See [design, evidence, limitations and pending owner worksheet](docs/SHARED-ROSTER-EDITING.md).
+This feature is proposed, unmerged and undeployed; owner Mac/DEV acceptance remains
+pending and separate from Issue #36. No hosted Supabase action was performed.
 
 ## Architecture and stack
 
 The client uses React 19, TypeScript 6, Vite 8, and Tailwind CSS 4. [src/App.tsx](src/App.tsx) selects local preview or the DEV Auth gate; [src/Calculator.tsx](src/Calculator.tsx) handles the unchanged calculator inputs and browser-local roster. See [frontend Auth setup and acceptance](docs/AUTH.md). The pure TypeScript engine in [src/calculation.ts](src/calculation.ts) parses money into integer cents, scales weights to integer hundredths, and uses BigInt intermediates for exact proportional arithmetic and signed reconciliation.
 
-The merged PR #34 baseline runs 153 frontend tests, including the original 122 Auth/calculator/configuration tests and 31 shared-roster tests. Issue #35 also runs offline provisioning tests through `npm test`. ESLint and TypeScript also check the source. GitHub Actions runs frontend tests, lint, and the production build on pull requests and pushes to `main`.
+The merged baseline runs 153 frontend tests plus 14 offline provisioning groups.
+The Issue #38 branch adds 86 weight/management tests (239 frontend tests total).
+ESLint and TypeScript also check the source. GitHub Actions runs frontend tests,
+lint, and the production build on pull requests and pushes to `main`.
 
 Versioned PostgreSQL migrations define organization-scoped roles, employees, and memberships, with exact weights, same-tenant constraints, and deny-by-default RLS and table privileges. Active admins and closers are authorized within their restaurant. A separate local Supabase harness verifies real Auth/PostgREST authorization. Merged PR #34 adds the membership-aware, read-only frontend roster using the existing SELECT grants and RLS; the calculator remains browser-local. See [backend design and verification](docs/BACKEND.md). A separate CI job checks the database schema.
 
@@ -45,6 +60,12 @@ npm run check    # All tests, ESLint, TypeScript, and production build
 npm run build    # Production bundle in dist/
 npm run preview  # Serve the production build locally
 ```
+
+Issue #38 adds independent local feature checks: `npm run check:roster-editing`
+(full pinned Supabase, two clean replays) and `npm run check:roster-editing:components`
+(narrower real Auth/PostgREST proof, mock API-role bootstrap). Both destroy only
+their disposable local fixtures. Run CLI suites serially; see the design guide
+for prerequisites and evidence limits.
 
 The explicitly marked local-only prototype needs no backend services or credentials. For optional DEV email/password login, follow [docs/AUTH.md](docs/AUTH.md): configure only the project URL and publishable key in ignored `.env.local`. In configured mode, a verified signed-in session is required before the calculator appears. With Bash and a running local Docker daemon, `npm run check:db` runs disposable PostgreSQL migration, constraint, and RLS checks. `npm run check:supabase` runs real local Supabase Auth/PostgREST tests with synthetic accounts and two fictional restaurants, using pinned CLI 2.120.0. Run it from Mac Terminal with Docker Desktop, not the VS Code Dev Container. It resets and removes the dedicated local integration database. Both backend checks are separate from `npm run check`, which does not validate SQL. See [docs/BACKEND.md](docs/BACKEND.md) for prerequisites, commands, and verification limits.
 
@@ -70,7 +91,12 @@ Vite binds to `0.0.0.0` inside the container through `VITE_DEV_HOST`; outside it
 - No lunch/dinner shift records, finalization, immutable history, or actual payout ledger exist. Preview allocations must not be treated as historical payments.
 - Adjustments, automatic leftover allocation, reports, exports, and offline synchronization are not implemented. Money and weights accept nonnegative plain decimals with at most two fractional digits; invalid or unsafe values are rejected rather than rounded.
 
-Tenant-scoped schema authorization and optional DEV sign-in are implemented. Membership-aware organization context and a read-only shared roster are merged in PR #34; Issue #35 proposes only offline synthetic DEV provisioning; shared roster editing/synchronization, trusted account administration and invitations, separate shifts, immutable payout history, adjustments and reconciliation, reporting/export, offline sync, and launch hardening remain future work. Sequencing and business rules remain provisional. [ROADMAP.md](ROADMAP.md) records merged milestones and later work.
+Tenant-scoped schema authorization and optional DEV sign-in are implemented.
+PR #34 merged the read-only shared roster; PR #37 merged offline synthetic DEV
+provisioning. Issue #38 proposes shared editing on this branch. Synchronization,
+trusted account administration/invitations, separate shifts, immutable payout
+history, adjustments, reporting/export and launch hardening remain future work.
+[ROADMAP.md](ROADMAP.md) records merged milestones and later work.
 
 ## Project documentation
 

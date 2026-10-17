@@ -13,6 +13,8 @@
     "check:db": "bash scripts/check-db.sh && npm run check:dev-provision-db",
     "supabase:local": "node scripts/supabase-local.mjs",
     "check:supabase": "node scripts/check-supabase.mjs",
+    "check:roster-editing": "node scripts/check-roster-editing.mjs",
+    "check:roster-editing:components": "node scripts/check-roster-editing-components.mjs",
     "check:hosted-preflight": "node --test --test-isolation=none scripts/hosted-supabase-tests.mjs",
     "check:dev-provision": "node --test --test-isolation=none scripts/dev-roster-provision-tests.mjs",
     "check:dev-provision-db": "node scripts/check-dev-provision-db.mjs"

@@ -1,5 +1,11 @@
 # Roster schema and authorization (Issues #14 and #21)
 
+The Issue #38 feature branch proposes [shared roster editing](SHARED-ROSTER-EDITING.md)
+under these unchanged migrations, grants and RLS. Exact numeric text/string and
+short-lived `xmin` checks passed against actual local Auth/PostgREST components;
+full CLI startup timed out, so managed-stack/Mac/owner acceptance remains pending.
+No hosted access or database/security modification was performed.
+
 PostgreSQL provides exact numeric storage, foreign keys, transactions and row-level
 security (RLS). Supabase is the intended managed PostgreSQL/Auth platform for the
 future shared application. The migrations use Supabase API role names and reference

@@ -1,10 +1,17 @@
 # Membership-aware shared roster (Issue #31)
 
+**Issue #38 feature branch:** proposed [shared roster management](SHARED-ROSTER-EDITING.md)
+adds a management entry point beside the summary, exact decimal strings and
+short-lived xmin conflict checks under existing security. Local component proof
+passed; full CLI/Mac/owner acceptance remains pending. No hosted operation or
+Issue #36 fixture access was performed. The historical read-only milestone and
+its evidence below describe the merged baseline before these proposed edits.
+
 PR #34 is merged, including the filesystem portability fix, with 153 frontend
 tests. The owner reports authorized roster read, unrelated nonmember denial,
 revocation with an existing session, four-table HTTP GET-only inspection and cleanup
 of two synthetic users/fixture passed. Codex did not independently execute hosted
-checks. Extended owner-only cases remain Issue #36. Issue #35 proposes separate
+checks. Extended owner-only cases remain Issue #36. Issue #35 / merged PR #37 provides separate
 [offline DEV provisioning](DEV-PROVISIONING.md); it authorizes no hosted operation.
 The configured DEV frontend includes a separate
 **Shared roster · DEV · Read only** section below verified Auth. The calculator

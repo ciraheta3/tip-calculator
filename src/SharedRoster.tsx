@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { accessChanged, readOrganizations, readSharedRoster, SharedRosterError } from './sharedRosterData';
 import type { Organization, SharedRosterData } from './sharedRosterData';
+import ManageSharedRoster from './ManageSharedRoster';
 
 const buttonClass = 'rounded border border-blue-700 text-blue-800 px-4 py-2 disabled:opacity-50';
 type Props = { client: SupabaseClient; userId: string };
@@ -35,9 +36,9 @@ export default function SharedRoster({ client, userId }: Props) {
     };
   }, []);
   return <section aria-labelledby="shared-roster-title" className="max-w-6xl mx-auto my-6 p-4 sm:p-6 bg-white border rounded-xl space-y-4">
-    <h2 id="shared-roster-title" className="text-xl font-bold">Shared roster · DEV · Read only</h2>
+    <h2 id="shared-roster-title" className="text-xl font-bold">Shared roster · DEV</h2>
     <p className="text-sm text-gray-700">Shared restaurant records are separate from your browser-local calculator roster. Neither roster is synchronized; shared rows never affect payouts.</p>
-    <p className="text-sm text-gray-600">Shared weights are not displayed pending exact decimal transport review.</p>
+    <p className="text-sm text-gray-600">Open management to inspect exact default share weights. The summary shows names and status.</p>
     <button className={buttonClass} onClick={refresh}>Refresh access / retry</button>
     <RosterRequest key={`${selection}:${revision}`} client={client} userId={userId} selection={selection} onSelect={setSelection} />
   </section>;
@@ -45,6 +46,8 @@ export default function SharedRoster({ client, userId }: Props) {
 
 function RosterRequest({ client, userId, selection, onSelect }: Props & { selection: string; onSelect: (id: string) => void }) {
   const [state, setState] = useState<State>({ organizations: [], selected: '', loading: true });
+  const [manage, setManage] = useState(false);
+  const [reload, setReload] = useState(0);
   useEffect(() => {
     const controller = new AbortController();
     let current = true;
@@ -72,7 +75,7 @@ function RosterRequest({ client, userId, selection, onSelect }: Props & { select
       }
     })();
     return () => { current = false; controller.abort(); };
-  }, [client, userId, selection]);
+  }, [client, userId, selection, reload]);
 
   const roleById = new Map(state.roster?.roles.map(role => [role.id, role]));
   return <div className="space-y-4">
@@ -90,8 +93,13 @@ function RosterRequest({ client, userId, selection, onSelect }: Props & { select
       <h3 className="font-semibold">No restaurant access assigned</h3>
       <p>Contact the project owner for access. You can continue using the browser-local calculator.</p>
     </div>}
-    {state.roster && <>
+    {state.roster && manage ? <ManageSharedRoster client={client} userId={userId} organizationId={state.selected} onClose={() => {
+      setManage(false);
+      setState({ organizations: [], selected: '', loading: true });
+      setReload(value => value + 1);
+    }} /> : state.roster && <>
       <p className="text-sm text-gray-600">Snapshot only. Access is rechecked on refresh, focus, reconnect and every minute; this is not a live subscription.</p>
+      <button className={buttonClass} onClick={() => setManage(true)}>Manage shared roster · DEV</button>
       <div className="grid sm:grid-cols-2 gap-6">
         <div><h3 className="font-semibold">Shared job roles</h3>
           {!state.roster.roles.length ? <p>No shared job roles.</p> : <ul className="space-y-2 mt-2">

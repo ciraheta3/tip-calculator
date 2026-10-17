@@ -1,5 +1,23 @@
 # Restaurant Tip Pool Manager
 
+## Proposed shared default management (Issue #38 feature branch)
+
+The [scoped editing design](SHARED-ROSTER-EDITING.md) implements the approved admin/
+closer V1 roster permissions under existing RLS/column ACLs, with exact decimal
+text/string transport and bounded xmin conflict checks. It remains proposed,
+unmerged and undeployed. No shifts, payout inputs, synchronization, import or
+historical facts are created by shared default edits.
+
+Interim UI decisions: new employee assignments require an active same-restaurant
+role; existing inactive links remain visible and are retained, with no automatic
+remapping on deactivation. Changing a default role retains the override explicitly
+submitted in the form; blank requests inheritance, zero requests explicit zero.
+Whether to enforce active-role assignment transactionally in the database remains
+an open product/security decision; the current rule is a conservative UI check.
+One-minute drafts and transaction tokens are not a durable offline/sync protocol.
+Independent Mac/full-stack and owner-only DEV acceptance remain pending and separate
+from Issue #36. No hosted fixture or private owner work was accessed.
+
 ## Product direction
 
 Help managers calculate weighted tip pools and reconcile collected tips with payouts. The eventual product will support shared employees, independent lunch/dinner shifts, role/employee/shift weight overrides, early-departure and understaffing adjustments, and secure shared accounts.
